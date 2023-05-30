@@ -4,7 +4,7 @@
 <style>
     /* Page-Body formatting */
     body {
-        background-color: #b3d2f0;
+        background-color: #bfd6ee;
         font-family: Arial, Helvetica, sans-serif;
     }
 
@@ -98,7 +98,7 @@
 <!-- Where the magic happens -->
 <script>
     // Various variables
-    let channelName = "dandyfloss";
+    let channelName = "kipbite";
 
     // Create "Chat"-Variable that inserts to "body"'s "ul" element
     var chat = document.querySelector("#chat>ul");
@@ -211,6 +211,7 @@
         messageText.className = "Message";                                          // Set message style-class
         messageText.innerHTML = ` ${escapeMessage(
             resolveEmotes(message, extra.messageEmotes))}`;                         // Set message text
+        messageText.style.fontWeight = 'medium';                                    // Stylize user in medium-bold
 
 
         newMessage.append(messageUser, messageText);    // Combine elements into message
