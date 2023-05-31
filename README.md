@@ -1,6 +1,9 @@
 # ChatOverlay
 > A Twitch chat overlay for OBS that requires no log-in or additional service like StreamLabs,...
 
+## Version 0.2:
+- Added some colorizable badges (broadcaster, staff, mod, vip, verified, sub)
+
 ## Version 0.1:
 - Username displayed inside a rounded box of their user-color (random if user never picked one)
 - Emotes are displayed
@@ -9,5 +12,4 @@
 - Messages fade-out and get removed from the file after 20 seconds
 
 ## To-Do List:
-- Render global badges
-- Let user specify channel_ID to load and render channel badges for subscribers,...
+- Integrate pronouns api
