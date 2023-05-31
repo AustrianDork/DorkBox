@@ -1,0 +1,275 @@
+<html lang="en">
+
+<!-- In-File CSS-sheet to contain everything in a single document for OBS -->
+<style>
+    /* Page-Body formatting */
+    body {
+        background-color: #bfd6ee;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* List-Block formatting */
+    li {
+        list-style-type: none;
+        border: 2px hidden;
+        border-radius: 5px;
+        background-color: #1c1b1f4f;
+        margin-bottom: 5px;
+        padding-left: 5px;
+
+        animation:li 0.5s 1;
+        -webkit-animation:li 0.5s 1;
+        animation-fill-mode: forwards;
+
+        animation-delay: 19s;
+        -webkit-animation-delay:19s;
+        -webkit-animation-fill-mode: forwards;
+    }
+    @keyframes li{
+        from {opacity :1;}
+        to {opacity :0;}
+    }
+    @-webkit-keyframes li{
+        from {opacity :1;}
+        to {opacity :0;}
+    }
+
+    /* Remove indentation of ul */
+    ul {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    /* Chat-container specifications */
+    #chat {
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    /* Remove scrollbar */
+    #chat::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Formatting class for "messageUser" span-containers */
+    .User {
+        display: inline;
+        border: 2px hidden;
+        border-radius: 5px;
+        padding: 3px;
+        margin-left: -5px;
+    }
+
+    /* Formatting class for "messageText" span-containers */
+    .Message {
+        display: inline;
+        color: #ffffff;
+        line-height: 1.5rem;
+    }
+
+    /* Formatting for emote scale */
+    .EmoteScale {
+        max-height: 1.5rem;
+        max-width: 1.5rem;
+        vertical-align: middle;
+    }
+
+    /* Formatting SVG badges */
+    svg {
+        vertical-align: middle;
+        padding-bottom: 3px;
+    }
+</style>
+
+<!-- Header; Not super relevant except for the JavaScript sources -->
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitch Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/comfy.js@latest/dist/comfy.min.js"></script>
+</head>
+
+<!-- Page-Body; Just contains the chat -->
+<body>
+    <div id="chat">
+        <ul>
+        </ul>
+    </div>
+</body>
+
+<!-- Where the magic happens -->
+<script>
+    // Various variables
+    let channelName = "cryptiddork";
+    const paramsURL = new URLSearchParams(window.location.search);
+    
+    // Override channelName if given via quaryString in URL
+    channelName = paramsURL.get('channel');
+
+    // Create "Chat"-Variable that inserts to "body"'s "ul" element
+    var chat = document.querySelector("#chat>ul");
+
+    // Connect to Twitch Chat
+    ComfyJS.Init(channelName);
+
+    // Escape all html code but UnEscape emote links
+    function escapeMessage(unsafe) {
+        let safe = unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        safe = safe.replaceAll("&lt;img class=&quot;EmoteScale&quot; src=&quot;https://static-cdn.jtvnw.net/emoticons/v2/",
+             `<img class="EmoteScale" src="https://static-cdn.jtvnw.net/emoticons/v2/`);
+        safe = safe.replaceAll(`/default/dark/1.0&quot;&gt;`, `/default/dark/1.0">`);
+        return safe;
+    }
+
+    // Random default color if user-color has not set one
+    let defaultColors = [
+        '#9ACD32','#FF4500','#2E8B57','#DAA520','#D2691E',
+        '#5F9EA0','#1E90FF','#FF69B4','#8A2BE2','#00FF7F'
+    ]
+    function resolveColor(color) {
+        if(color !== null) {
+            return color;
+        }
+        else {
+            let random = Math.floor(Math.random() * 10);
+            return defaultColors[random];
+        }
+    }
+
+    // Parses emotes in raw message
+    function resolveEmotes(message, emotes) {
+        if(emotes == null) {
+            return message;
+        }
+        const stringReplacements = [];
+        Object.entries(emotes).forEach(([id, positions]) => {
+            const position = positions[0];
+            const [start, end] = position.split("-");
+            const stringToReplace = message.substring(
+                parseInt(start, 10),
+                parseInt(end, 10) + 1
+            );
+            stringReplacements.push({
+                stringToReplace: stringToReplace,
+                replacement: `<img class="EmoteScale" src="https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/1.0">`,
+            });
+        });
+        const messageHTML = stringReplacements.reduce(
+            (acc, { stringToReplace, replacement }) => {
+                return acc.split(stringToReplace).join(replacement);
+            },
+            message
+        );
+        return messageHTML;
+    }
+
+    // Pick contrasting color from 2 options
+    function pickColor(bgColor, lightColor, darkColor) {
+        var color = (bgColor.charAt(0) === '#') ? bgColor.substring(1, 7) : bgColor;
+        var r = parseInt(color.substring(0, 2), 16); // hexToR
+        var g = parseInt(color.substring(2, 4), 16); // hexToG
+        var b = parseInt(color.substring(4, 6), 16); // hexToB
+        var uicolors = [r / 255, g / 255, b / 255];
+        var c = uicolors.map((col) => {
+            if (col <= 0.03928) {
+                return col / 12.92;
+            }
+            return Math.pow((col + 0.055) / 1.055, 2.4);
+        });
+        var L = (0.2126 * c[0]) + (0.7152 * c[1]) + (0.0722 * c[2]);
+        return (L > 0.179) ? darkColor : lightColor;
+    }
+
+    // Make badges
+    function makeBadgeString(badges) {
+        if(badges == null) {
+            return "";
+        }
+        let badgeString = "";
+        Object.entries(badges).forEach(([type, spec]) => {
+            switch(type) {
+                case 'broadcaster':
+                    badgeString += '<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">'
+                        +'<g class="layer"><g id="svg_1"><rect fill="currentColor" height="9.88" id="svg_5" rx="1.5" width="9.88" x="1" y="3"/>'
+                        +'<path d="m15,3.82c0,0 -5.56,3.09 -5.56,3.09c0,0 0,2.06 0,2.06c0,0 5.56,3.09 5.56,3.09c0,0 0,-8.24 0,-8.24z" fill="currentColor" id="svg_3"/></g></g></svg>';
+                    break;
+                case 'moderator': 
+                    badgeString += '<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">'
+                        +'<g class="layer"><path d="m0.9,13.98l1.14,1.04l3.19,-1.95l2.37,1.93l1.33,-1.18l-2.28,-1.85l8.47,-6.73l0.02,-4.34l-5.47,-0.02l-5.52,9.1l-2.24,-1.75l-0.99,1.2l1.97,1.66l-1.98,2.89l0,0z" '
+                        +'fill="currentColor" id="svg_8" stroke="#000000" stroke-width="0"/></g></svg>';
+                    break;
+                case 'staff': 
+                    badgeString += '<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">'
+                        +'<g class="layer"><path d="m1,12l0,1.75l1.25,1.25l1.75,0l5.5,-5.5l1,0.75l1.25,0l3.25,-3.25l0,-2l-1,-1l-3,3l-2,-2l3.25,-3l-1,-1l-2.25,0l-3.25,3.25l0,1.25l0.75,1l-5.5,5.5z" '
+                        +'fill="currentColor" id="svg_3" stroke="#000000" stroke-width="0"/></g></svg>';
+                    break;
+                case 'vip': 
+                    badgeString += '<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">'
+                        +'<g class="layer"><path d="m3.97,0.97l7.85,0.03l3.18,4.86l-6.99,8.9l-7.04,-8.92l2.99,-4.86z" fill="currentColor" id="svg_3"/></g></svg>';
+                    break;
+                case 'partner':
+                    badgeString += '&#x2714;';
+                    break;
+                case 'founder':
+                    badgeString += '<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g class="layer">'
+                        +'<g id="svg_23"><path d="m15,1c0,0 -12.4,0 -12.4,0l0,3c0.8,0 1.6,-0.6 1.6,-1.4l3,0l0,10.4l1.2,0l1.2,-2.6l0,-3l-1.2,0l0,-4.8l6.6,0l0,-1.6z" '
+                        +'fill="currentColor" id="svg_12"/><path d="m2.6,2.6l-1.6,0l0,12.4l6.2,0l7.8,-7.8l0,-4.6l-0.8,-0.6l-0.8,0.6l0,0.8c0,0 -0.8,0 -0.8,0c0,0 0,3.8 0,3.8c0,0 -0.8,0 -0.8,0c0,0 0,-3.8 0,-3.8c0,0 '
+                        +'-0.8,0 -0.8,0c0,0 0,-0.2 0,-1.2l-0.4,0l0,5c0,0 -2.2,0 -2.2,0c0,0 0,5.4 0,5.4c0,0 -1.2,0 -1.2,0c0,0 0,0.2 0,0.2c0,0 -3.2,0 -3.2,0c0,0 0,-7.8 0,-7.8c0,0 -1.4,0 -1.4,0l0,-1l0.6,-0.7l-0.6,-0.7z" '
+                        +'fill="currentColor" id="svg_14"/><path d="m11,3.8c-0.6,0 -1,0 -1,0c0,0 -0.2,-0.4 -0.2,-0.4c0,0 -0.4,0 -0.4,0c0,0 -0.2,0.4 -0.2,0.4c0,0 0,0.2 0,0.2c0,0 0.2,0.4 0.2,0.4l0.8,0.2l0.4,0.6c0.13,0 '
+                        +'0.27,0 0.4,0l0,-1.4z" fill="currentColor" id="svg_16"/><path d="m10.8,3.4l0,-1l-1,0l1,1z" fill="currentColor" id="svg_17"/><path d="m9.2,2.4l-1,1l0,-1l1,0z" '
+                        +'fill="currentColor" id="svg_18"/><path d="m10.8,6.4l-1,1l1,0l0,-1z" fill="currentColor" id="svg_19"/>'
+                        +'<path d="m9.2,7.4l-1,-1l0,1l1,0z" fill="currentColor" id="svg_20"/><path d="m8,6c0.4,0 1,0 1,0c0,0 0.2,0.4 0.2,0.4c0,0 0.4,0 0.4,0c0,0 0.2,-0.4 0.2,-0.4c0,0 0,-0.2 0,-0.2c0,0 -0.2,-0.4 '
+                        +'-0.2,-0.4l-0.8,-0.2l-0.4,-0.6l-0.4,0l0,1.4z" fill="currentColor" id="svg_21"/></g></g></svg>';
+                    break;
+                case 'subscriber': 
+                    badgeString += '&#x2764;';
+                    break;
+                default: 
+                    break;
+            }
+        });
+        return badgeString;
+    }
+
+    // BUILD CHAT-MESSAGE
+    ComfyJS.onChat = (user, message, flags, self, extra) => {
+        var newMessage = document.createElement("li");                                                              // Create a List item for new message
+            setTimeout( function() {
+                newMessage.remove();
+            }, 20000);
+
+        var messageText = document.createElement("div");                                                            // (Inline) Span item for message-content
+        var messageUser = document.createElement("div");                                                            // (Inline) Span item for message-sender
+
+        // User-name box
+        messageUser.className = "User";                                                                             // Set user style-class
+        messageUser.innerHTML = `${makeBadgeString(extra.userBadges)} ${escapeMessage(user)}`;                      // Set user badges and name
+        messageUser.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                         // Set user-box-color
+        messageUser.style.backgroundColor = resolveColor(extra.userColor);                                          // Pick contrasting user-color
+        messageUser.style.fontWeight = 'bold';                                                                      // Stylize user in bold
+
+        // Message text
+        messageText.className = "Message";                                                                          // Set message style-class
+        messageText.innerHTML = ` ${escapeMessage(resolveEmotes(message, extra.messageEmotes))}`;                   // Set message text
+        messageText.style.fontWeight = 'medium';                                                                    // Stylize user in medium-bold
+
+
+        newMessage.append(messageUser, messageText);    // Combine elements into message
+        chat.append(newMessage);                        // Display message
+    }
+
+    // Subscription messages?
+    ComfyJS.onSub = (user, message, subTierInfo, extra) => {
+        console.log(user, message, subTierInfo);
+    }
+
+    ComfyJS.onResub = (user, message, streakMonths, cumulativeMonths, subTierInfo, extra) => {
+        console.log(user, message, streakMonths, cumulativeMonths, subTierInfo);
+    }
+</script>
+
+</html>
