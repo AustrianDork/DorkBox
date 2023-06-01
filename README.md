@@ -17,6 +17,7 @@
 - Use custom channel-badges for subs
 - Subscription messages / Gift messages
 
+## Version History:
 ### Version 0.2:
 - Added some colorizable badges (broadcaster, staff, mod, vip, verified, sub, founder)
 
