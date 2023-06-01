@@ -15,6 +15,7 @@
 ## Planned To-Do List:
 - Integrate [Pronouns Extension](https://pronouns.alejo.io/)
 - Use custom channel-badges for subs
+- Subscription messages / Gift messages
 
 ### Version 0.2:
 - Added some colorizable badges (broadcaster, staff, mod, vip, verified, sub, founder)
