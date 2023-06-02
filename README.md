@@ -9,9 +9,11 @@
 - Specify the width and height to your liking
 
 ## What it looks like:
+- Messanger-Bubble-esque appearence
+- Displays animated and static emotes
 - Current badges: Broadcaster, Mod, Staff, VIP, Partner, Founder, Subscriber\
  ![Badges](/Resources/CurrentBadges.PNG?raw=true "Badges")
- 
+- Messages fade out after 20 seconds
 - In action:\
  ![Screenshot](/Resources/Screenshot.PNG?raw=true "Screenshot")
 
@@ -19,6 +21,7 @@
 - Integrate [Pronouns Extension](https://pronouns.alejo.io/)
 - Use custom channel-badges for subs
 - Subscription messages / Gift messages
+- Make fade-out time easily changable
 
 ## Version History:
 ### Version 0.2:
