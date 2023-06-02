@@ -9,7 +9,7 @@
 - Specify the width and height to your liking
 
 ## What it looks like:
-- Minimalistic, instant-messeger-esque appearence
+- Minimalistic, instant-messenger-esque appearence
 - Displays animated and static emotes
 - Current badges: Broadcaster, Mod, Staff, VIP, Partner, Founder, Subscriber\
  ![Badges](/Resources/CurrentBadges.PNG?raw=true "Badges")
