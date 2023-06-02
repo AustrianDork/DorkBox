@@ -1,5 +1,5 @@
 # ChatOverlay
-> A Twitch chat overlay for OBS that requires additional log-in service like StreamLabs,...
+> A Twitch chat overlay for OBS that requires no additional log-in service like StreamLabs,...
 
 ## How To Setup:
 - Save the **Chatbox.html** file in a folder of your liking
