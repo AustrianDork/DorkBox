@@ -2,7 +2,7 @@
 > A Twitch chat overlay for OBS that requires no additional log-in service like StreamLabs,...
 
 ## How To Setup:
-- Save the **Chatbox.html** file in a folder of your liking
+- Save the **Chatbox.html** file in a folder of your liking ([Latest Release Here](https://github.com/AustrianDork/DorkBox/releases/latest))
 - Open the file in a text editior
 - Search for the line `let channelName = "CHANNEL";` and replace `CHANNEL` with your channel-name as it appears in the link to your channel
 - Open OBS, add a new browser source, check the option **Local file** and select the **Chatbox.html** file
