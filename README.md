@@ -9,8 +9,11 @@
 - Specify the width and height to your liking
 
 ## Some Impressions:
-- Current Badges: Broadcaster, Mod, Staff, VIP, Partner, Founder, Subscriber\
- ![Badges](/Resources/CurrentBadges.PNG?raw=true "Badges") 
+- Current badges: Broadcaster, Mod, Staff, VIP, Partner, Founder, Subscriber\
+ ![Badges](/Resources/CurrentBadges.PNG?raw=true "Badges")
+ 
+- In action\
+ ![Screenshot](/Resources/Screenshot.PNG?raw=true "Screenshot")
 
 ## Planned To-Do List:
 - Integrate [Pronouns Extension](https://pronouns.alejo.io/)
