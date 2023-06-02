@@ -4,7 +4,7 @@
 ## How To Setup:
 - Save the **Chatbox.html** file in a folder of your liking ([Latest Release Here](https://github.com/AustrianDork/DorkBox/releases/latest))
 - Open the file in a text editior
-- Search for the line `let channelName = "CHANNEL";` and replace `CHANNEL` with your channel-name as it appears in the link to your channel
+- Search for the line `let channelName = "CHANNEL";` and replace `CHANNEL` with your name as it appears in the link to your channel
 - Open OBS, add a new browser source, check the option **Local file** and select the **Chatbox.html** file
 - Specify the width and height to your liking
 
