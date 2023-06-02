@@ -8,11 +8,11 @@
 - Open OBS, add a new browser source, check the option **Local file** and select the **Chatbox.html** file
 - Specify the width and height to your liking
 
-## Some Impressions:
+## What it looks like:
 - Current badges: Broadcaster, Mod, Staff, VIP, Partner, Founder, Subscriber\
  ![Badges](/Resources/CurrentBadges.PNG?raw=true "Badges")
  
-- In action\
+- In action:\
  ![Screenshot](/Resources/Screenshot.PNG?raw=true "Screenshot")
 
 ## Planned To-Do List:
