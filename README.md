@@ -18,9 +18,9 @@
  ![Screenshot](/Resources/Screenshot.PNG?raw=true "Screenshot")
 
 ## Planned To-Do List:
-- Integrate [Pronouns Extension](https://pronouns.alejo.io/)
+- Integrate [Pronouns Extension](https://pronouns.alejo.io/) (upcoming version)
+- Subscription messages / Gift messages (upcoming version)
 - Use custom channel-badges for subs
-- Subscription messages / Gift messages
 - Make fade-out time easily changable
 
 ## Version History:
