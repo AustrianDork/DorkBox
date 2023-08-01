@@ -20,8 +20,8 @@
 ## Planned To-Do List:
 - Integrate [Pronouns Extension](https://pronouns.alejo.io/) (upcoming version)
 - Subscription messages / Gift messages (upcoming version)
-- Use custom channel-badges for subs
-- Make fade-out time easily changable
+- Use custom channel-badges for subs (difficult; Twitch requires credentials to return channel badges)
+- Make fade-out time easily changable (upcoming version)
 
 ## Version History:
 ### Version 0.2:
