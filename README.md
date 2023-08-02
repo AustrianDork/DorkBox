@@ -5,7 +5,7 @@
 - Save the **Chatbox.html** file in a folder of your liking ([Latest Release Here](https://github.com/AustrianDork/DorkBox/releases/latest))
 - Open the file in your browser of choice
 - Click on the address bar to edit the "url" (should read something like `file:///.../Chatbox.html`)
-  - **Required:** Add `?channel=YourChannelName` and enter your channel name as it appears in your URL of your twitch channel
+  - **Required:** Add `?channel=YourChannelName` and enter your channel name as it appears in the URL of your twitch channel
   - **Optional:** If you want to display [Pronouns](https://pronouns.alejo.io/) (off by default), add `&pronouns=true`
   - **Optional:** If you want to change the message fade-out delay (default is 30 seconds), add `&delay=NumberInSeconds`
   - **Optional:** If you want to change the scale (default is 1), add `&zoom=ScaleNumber`
