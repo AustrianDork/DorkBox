@@ -144,13 +144,18 @@
         '#9ACD32','#FF4500','#2E8B57','#DAA520','#D2691E',
         '#5F9EA0','#1E90FF','#FF69B4','#8A2BE2','#00FF7F'
     ]
-    function resolveColor(color) {
+    let userColors = {};
+    function resolveColor(color, user) {
         if(color) {
             return color;
         }
+        if(userColors[user]) {
+            return userColors[user];
+        }
         else {
             let random = Math.floor(Math.random() * 10);
-            return defaultColors[random];
+            userColors[user] = defaultColors[random];
+            return userColors[user];
         }
     }
 
@@ -325,8 +330,8 @@
         // User-name box
         messageUser.className = "User";                                                                                     // Set user style-class
         messageUser.innerHTML = `${makeBadgeString(extra.userBadges)}${await resolvePronouns(user)}${escapeMessage(user)}`; // Set user badges and name
-        messageUser.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                                 // Set user-box-color
-        messageUser.style.backgroundColor = resolveColor(extra.userColor);                                                  // Pick contrasting user-color
+        messageUser.style.color = pickColor(resolveColor(extra.userColor, user), '#fff', '#000');                           // Set user-box-color
+        messageUser.style.backgroundColor = resolveColor(extra.userColor, user);                                            // Pick contrasting user-color
         messageUser.style.fontWeight = 'bold';                                                                              // Stylize user in bold
 
         // Message text
@@ -355,8 +360,8 @@
         // User-name box
         messageUser.className = "User";                                                                             // Set user style-class
         messageUser.innerHTML = `${escapeMessage(user)} just subscribed!`;                                          // Set user badges and name
-        messageUser.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                         // Set user-box-color
-        messageUser.style.backgroundColor = resolveColor(extra.userColor);                                          // Pick contrasting user-color
+        messageUser.style.color = pickColor(resolveColor(extra.userColor, user), '#fff', '#000');                   // Set user-box-color
+        messageUser.style.backgroundColor = resolveColor(extra.userColor, user);                                    // Pick contrasting user-color
         messageUser.style.fontWeight = 'bold';                                                                      // Stylize user in bold
         await resolvePronouns(user);
 
@@ -367,8 +372,8 @@
         } else {
             messageText.innerHTML = ` ${escapeMessage(resolveEmotes(message, extra.messageEmotes))}`;               // Set message text
         }
-        messageText.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                         // Set user-box-color
-        newMessage.style.backgroundColor = resolveColor(extra.userColor);                                           // Pick contrasting user-color
+        messageText.style.color = pickColor(resolveColor(extra.userColor, user), '#fff', '#000');                   // Set user-box-color
+        newMessage.style.backgroundColor = resolveColor(extra.userColor, user);                                     // Pick contrasting user-color
         messageText.style.fontWeight = 'medium';                                                                    // Stylize user in medium-bold
 
         newMessage.append(messageUser, messageText);    // Combine elements into message
@@ -400,14 +405,14 @@
         // User-name box
         messageUser.className = "User";                                                                             // Set user style-class
         messageUser.innerHTML = `${escapeMessage(gifterUser)}${specifier}`;                                         // Set user badges and name
-        messageUser.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                         // Set user-box-color
-        messageUser.style.backgroundColor = resolveColor(extra.userColor);                                          // Pick contrasting user-color
+        messageUser.style.color = pickColor(resolveColor(extra.userColor, gifterUser), '#fff', '#000');             // Set user-box-color
+        messageUser.style.backgroundColor = resolveColor(extra.userColor, gifterUser);                              // Pick contrasting user-color
         messageUser.style.fontWeight = 'bold';                                                                      // Stylize user in bold
 
         // Message text
         messageText.className = "Message";                                                                          // Set message style-class
         messageText.innerHTML = "&#xfeff;";                                                                         // Set message to empty character to get proper line height
-        newMessage.style.backgroundColor = resolveColor(extra.userColor);                                           // Pick contrasting user-color
+        newMessage.style.backgroundColor = resolveColor(extra.userColor, gifterUser);                               // Pick contrasting user-color
         messageText.style.fontWeight = 'medium';                                                                    // Stylize user in medium-bold
 
         newMessage.append(messageUser, messageText);    // Combine elements into message
