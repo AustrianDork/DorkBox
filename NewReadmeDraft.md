@@ -38,7 +38,7 @@
     - Zooming in (values larger than 1) or zooming out (values smaller than 1)
 - Added subscription and gift notification
 - Added artist badge
-- Deleted chat messages instantly appear from the overlay as well
+- Deleted chat messages instantly disappear from the overlay as well
 ### Version 0.2:
 - Added some colorizable badges (broadcaster, staff, mod, vip, verified, sub, founder)
 ### Version 0.1:
