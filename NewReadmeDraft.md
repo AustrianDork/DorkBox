@@ -26,7 +26,7 @@
  ![Screenshot](/Resources/Screenshot.PNG?raw=true "Screenshot")
  
 ## Planned To-Do List:
-- Use custom channel-badges for subs (difficult; Twitch requires credentials to return channel badges)
+- Use custom channel-badges for subs (difficult; Twitch API wants credentials for that)
 
 ## Version History:
 ### Version 0.3:
