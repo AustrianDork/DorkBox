@@ -2,13 +2,13 @@
 
 <!-- CSS styling -->
 <style>
-    /* Page-Body formatting */
+    /* Page formatting for preview in browser */
     body {
         background-color: #bfd6ee;
         font-family: Arial, Helvetica, sans-serif;
     }
 
-    /* List-Block formatting */
+    /* Chat message parent object */
     li {
         list-style-type: none;
         border: 2px hidden;
@@ -21,8 +21,8 @@
         -webkit-animation:li 0.5s 1;
         animation-fill-mode: forwards;
 
-        animation-delay: 19s;
-        -webkit-animation-delay:19s;
+        animation-delay: 29s;
+        -webkit-animation-delay:29s;
         -webkit-animation-fill-mode: forwards;
     }
     @keyframes li{
@@ -34,13 +34,13 @@
         to {opacity :0;}
     }
 
-    /* Remove indentation of ul */
+    /* Remove indentation */
     ul {
         list-style: none;
         padding-left: 0;
     }
 
-    /* Correct chat display */
+    /* Correct chat display behaviour */
     #chat {
         width: 100%;
         height: 100%;
@@ -54,7 +54,7 @@
         display: none;
     }
 
-    /* Formatting class for "messageUser" span-containers */
+    /* Username field styling */
     .User {
         display: inline;
         border: 2px hidden;
@@ -63,37 +63,38 @@
         margin-left: -5px;
     }
 
-    /* Formatting class for "messageText" span-containers */
+    /* Message field styling */
     .Message {
         display: inline;
         color: #ffffff;
         line-height: 1.5rem;
     }
 
-    /* Formatting for emote scale */
+    /* Emotes look weird when not larger than fontsize */
     .EmoteScale {
         max-height: 1.5rem;
         max-width: 1.5rem;
         vertical-align: middle;
     }
 
-    /* Formatting SVG badges */
+    /* Allignment of badges */
     svg {
         vertical-align: middle;
         padding-bottom: 3px;
     }
 </style>
 
-<!-- Header -->
+<!-- Header; Not super relevant except for the JavaScript sources (cross-checked against integrity keys for safety!) -->
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Twitch Chat</title>
     <script src="https://cdn.jsdelivr.net/npm/comfy.js@latest/dist/comfy.min.js" integrity="sha512-cilvEKKfguwTMgSWIeSO4F09h27nAldPIfmakSDAR3I05e2meTNUbGinfsQQqwEnUUkspjszn0KMTG9BOBwI3w==" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js" integrity="sha512-pumBsjNRGGqkPzKHndZMaAG+bir374sORyzM3uulLV14lN5LyykqNk8eEeUlUkB3U0M4FApyaHraT65ihJhDpQ==" crossorigin="anonymous"></script>
 </head>
 
-<!-- Page-Body -->
+<!-- Page-Body; Just an empty list -->
 <body>
     <div id="chat">
         <ul>
@@ -101,15 +102,32 @@
     </div>
 </body>
 
-<!-- JavaScript that does everything -->
+<!-- Script -->
 <script>
-    // Various variables
-    let channelName = "CHANNEL";
+    // Settings
+    let channelName = "twitch";
+    let usePronouns = false;
+    let fadeTime = 30;
+    let zoomFactor = 1.0;
+
+    let paramURL = new URLSearchParams(window.location.search);
+    if (paramURL.has('channel')) {
+        channelName = paramURL.get('channel');
+    }
+    if (paramURL.has('pronouns')) {
+        usePronouns = paramURL.get('pronouns');
+    }
+    if (paramURL.has('delay')) {
+        fadeTime = paramURL.get('delay');
+    }
+    if (paramURL.has('zoom')) {
+        zoomFactor = paramURL.get('zoom');
+    }
 
     // Create "Chat"-Variable that inserts to "body"'s "ul" element
     var chat = document.querySelector("#chat>ul");
 
-    // Connect to Twitch Chat
+    // Connect to channel's chat
     ComfyJS.Init(channelName);
 
     // Escape all html code but UnEscape emote links
@@ -121,13 +139,13 @@
         return safe;
     }
 
-    // Random default color if a user never picked a color on twitch
+    // Random default color if user has not set one
     let defaultColors = [
         '#9ACD32','#FF4500','#2E8B57','#DAA520','#D2691E',
         '#5F9EA0','#1E90FF','#FF69B4','#8A2BE2','#00FF7F'
     ]
     function resolveColor(color) {
-        if(color !== null) {
+        if(color) {
             return color;
         }
         else {
@@ -136,7 +154,7 @@
         }
     }
 
-    // Parses emotes (must be done in raw message for accurate positioning)
+    // Parses emotes in raw message
     function resolveEmotes(message, emotes) {
         if(emotes == null) {
             return message;
@@ -180,7 +198,7 @@
         return (L > 0.179) ? darkColor : lightColor;
     }
 
-    // Parse badges for user
+    // Make badges (Sorry, ugly svg code but had to remake the badges from scratch)
     function makeBadgeString(badges) {
         if(badges == null) {
             return "";
@@ -225,38 +243,202 @@
                     badgeString += '<?xml version="1.0"?><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">'
                         +'<g class="layer"><path d="m8,4.37c2.88,-8.27 14.18,0 0,10.63c-14.18,-10.63 -2.88,-18.9 0,-10.63z" fill="currentColor" id="svg_1"/></g></svg>';
                     break;
+                case 'artist-badge':
+                    badgeString += '<svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg"><g class="layer">'
+                        +'<path d="m12.53,2.03c0,0 -1.24,-0.62 -2.06,-0.82c-0.82,-0.21 -2.06,-0.41 -4.12,0c-2.06,0.41 -5.15,2.26 -5.35,5.15c-0.21,2.06 0,6.38 2.68,7.82c3.09,1.24' 
+                        +'5.15,1.03 6.79,0.41c1.65,-0.62 1.44,-2.68 1.44,-2.06c0,0.62 0,-0.82 0,-1.24c0,-0.41 0.82,-1.03 1.24,-1.24c0.41,-0.21 1.03,-0.82 1.24,-1.24c0.21,-0.41' 
+                        +'0.62,-0.82 0.62,-2.26c0,-1.44 -0.62,-2.26 -0.62,-2.26c0,0 -0.41,-0.62 -0.41,-0.62c0,0 -1.44,1.44 -2.06,2.06c-0.62,0.62 -2.06,1.44 -2.06,1.44c0,0 0.21,1.44' 
+                        +'-0.21,2.26c-0.41,0.82 -1.03,1.24 -1.44,1.44c-0.41,0.21 -1.65,0.21 -2.06,0.21c-0.41,0 -2.26,0 -2.26,0c0,0 1.03,-1.24 1.24,-1.85c0.21,-0.62 0.21,-1.03 0.41,'
+                        +'-1.65c0.21,-0.62 0.82,-1.03 1.24,-1.24c0.41,-0.21 1.24,-0.21 1.24,-0.21c0,0 0.82,0 0.82,0c0,0 0.21,-0.21 1.24,-1.65c1.03,-1.44 2.47,-2.47 2.47,-2.47z"'
+                        +' fill="currentColor" id="svg_3"/></g></svg>'
                 default: 
                     break;
             }
         });
-        return badgeString;
+        return badgeString+' ';
     }
 
-    // Event: new chat message received
-    ComfyJS.onChat = (user, message, flags, self, extra) => {
-        var newMessage = document.createElement("li");                                                              // Create a List item for new message
+    // Pronouns integration
+    let pronounNames;
+    let userPronouns = {};
+    async function getPronounNames() {
+        if (pronounNames) return pronounNames;
+
+        const pronounsJSON = await fetch('https://pronouns.alejo.io/api/pronouns');
+        pronounNames = await pronounsJSON.json();
+
+        pronounNames = pronounNames.reduce((result, pronoun) => {
+            result[pronoun.name] = pronoun.display;
+            return result;
+        }, {});
+        
+        return pronounNames;
+    }
+    async function getUserPronouns(username) {
+        if (!pronounNames) {
+            await getPronounNames();
+        }
+
+        if (typeof userPronouns[username] == 'string') {
+            return userPronouns[username];
+        }
+
+        const userPronounsJSON = await fetch(
+            `https://pronouns.alejo.io/api/users/${username}`
+        );
+        const userPronounsData = await userPronounsJSON.json();
+
+        const pronounId = userPronounsData?.[0]?.pronoun_id;
+
+        if (pronounId) {
+            userPronouns[username] = `[${pronounNames[pronounId]}] `;
+        }
+        else {
+            userPronouns[username] = '';
+        }
+
+        return userPronouns[username];
+    }
+    async function resolvePronouns(username) {
+        if (!usePronouns) {
+            return '';
+        }
+        
+        pronoun = await getUserPronouns(username);
+        return pronoun;
+    }
+    
+    //// Message processing
+    // Regular
+    async function buildMessage(user, message, flags, self, extra) {
+        var newMessage = document.createElement("li");                                                                      // Create a List item for new message
             setTimeout( function() {
                 newMessage.remove();
-            }, 20000);
+            }, fadeTime*1000);
+        newMessage.style["animation-delay"] = `${fadeTime-1}s`;
+        newMessage.style["-webkit-animation-delay"] = `${fadeTime-1}s`;
+        newMessage.style.zoom = zoomFactor;
 
-        var messageText = document.createElement("div");                                                            // (Inline) Span item for message-content
-        var messageUser = document.createElement("div");                                                            // (Inline) Span item for message-sender
+        var messageText = document.createElement("div");                                                                    // (Inline) Span item for message-content
+        var messageUser = document.createElement("div");                                                                    // (Inline) Span item for message-sender
 
         // User-name box
-        messageUser.className = "User";                                                                             // Set user style-class
-        messageUser.innerHTML = `${makeBadgeString(extra.userBadges)} ${escapeMessage(user)}`;                      // Set user badges and name
-        messageUser.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                         // Set user-box-color
-        messageUser.style.backgroundColor = resolveColor(extra.userColor);                                          // Pick contrasting user-color
-        messageUser.style.fontWeight = 'bold';                                                                      // Stylize user in bold
+        messageUser.className = "User";                                                                                     // Set user style-class
+        messageUser.innerHTML = `${makeBadgeString(extra.userBadges)}${await resolvePronouns(user)}${escapeMessage(user)}`; // Set user badges and name
+        messageUser.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                                 // Set user-box-color
+        messageUser.style.backgroundColor = resolveColor(extra.userColor);                                                  // Pick contrasting user-color
+        messageUser.style.fontWeight = 'bold';                                                                              // Stylize user in bold
 
         // Message text
         messageText.className = "Message";                                                                          // Set message style-class
         messageText.innerHTML = ` ${escapeMessage(resolveEmotes(message, extra.messageEmotes))}`;                   // Set message text
         messageText.style.fontWeight = 'medium';                                                                    // Stylize user in medium-bold
 
+        newMessage.append(messageUser, messageText);    // Combine elements into message
+        newMessage.id = extra.id;                       // ID test to delete message if necessary
+        chat.append(newMessage);                        // Display message
+    }
+
+    // Subscription
+    async function buildSubMessage(user, message, extra) {
+        var newMessage = document.createElement("li");                                                              // Create a List item for new message
+            setTimeout( function() {
+                newMessage.remove();
+            }, fadeTime*1000);
+        newMessage.style["animation-delay"] = `${fadeTime-1}s`;
+        newMessage.style["-webkit-animation-delay"] = `${fadeTime-1}s`;
+        newMessage.style.zoom = zoomFactor;
+
+        var messageText = document.createElement("div");                                                            // (Inline) Span item for message-content
+        var messageUser = document.createElement("div");                                                            // (Inline) Span item for message-sender
+
+        // User-name box
+        messageUser.className = "User";                                                                             // Set user style-class
+        messageUser.innerHTML = `${escapeMessage(user)} just subscribed!`;                                          // Set user badges and name
+        messageUser.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                         // Set user-box-color
+        messageUser.style.backgroundColor = resolveColor(extra.userColor);                                          // Pick contrasting user-color
+        messageUser.style.fontWeight = 'bold';                                                                      // Stylize user in bold
+        await resolvePronouns(user);
+
+        // Message text
+        messageText.className = "Message";                                                                          // Set message style-class
+        if (!message) {
+            messageText.innerHTML = "&#xfeff;";
+        } else {
+            messageText.innerHTML = ` ${escapeMessage(resolveEmotes(message, extra.messageEmotes))}`;               // Set message text
+        }
+        messageText.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                         // Set user-box-color
+        newMessage.style.backgroundColor = resolveColor(extra.userColor);                                           // Pick contrasting user-color
+        messageText.style.fontWeight = 'medium';                                                                    // Stylize user in medium-bold
+
+        newMessage.append(messageUser, messageText);    // Combine elements into message
+        newMessage.id = extra.id;                       // ID test to delete message if necessary
+        chat.append(newMessage);                        // Display message
+    }
+
+    // Gift subscription
+    async function buildGiftMessage(gifterUser, extra, numbOfSubs=1) {
+        var newMessage = document.createElement("li");                                                              // Create a List item for new message
+            setTimeout( function() {
+                newMessage.remove();
+            }, fadeTime*1000);
+        newMessage.style["animation-delay"] = `${fadeTime-1}s`;
+        newMessage.style["-webkit-animation-delay"] = `${fadeTime-1}s`;
+        newMessage.style.zoom = zoomFactor;
+
+        var messageText = document.createElement("div");                                                            // (Inline) Span item for message-content
+        var messageUser = document.createElement("div");                                                            // (Inline) Span item for message-sender
+        
+        var specifier;
+        if (numbOfSubs == 1) {
+            specifier = ' gifted a sub!';
+        }
+        else {
+            specifier = ` gifted ${numbOfSubs} subs!`;
+        }
+
+        // User-name box
+        messageUser.className = "User";                                                                             // Set user style-class
+        messageUser.innerHTML = `${escapeMessage(gifterUser)}${specifier}`;                                         // Set user badges and name
+        messageUser.style.color = pickColor(resolveColor(extra.userColor), '#fff', '#000');                         // Set user-box-color
+        messageUser.style.backgroundColor = resolveColor(extra.userColor);                                          // Pick contrasting user-color
+        messageUser.style.fontWeight = 'bold';                                                                      // Stylize user in bold
+
+        // Message text
+        messageText.className = "Message";                                                                          // Set message style-class
+        messageText.innerHTML = "&#xfeff;";                                                                         // Set message to empty character to get proper line height
+        newMessage.style.backgroundColor = resolveColor(extra.userColor);                                           // Pick contrasting user-color
+        messageText.style.fontWeight = 'medium';                                                                    // Stylize user in medium-bold
 
         newMessage.append(messageUser, messageText);    // Combine elements into message
         chat.append(newMessage);                        // Display message
+    }
+
+    // Event: regular message
+    ComfyJS.onChat = async (user, message, flags, self, extra) => {
+        await buildMessage(user, message, flags, self, extra);
+    }
+
+    // Event: subscription
+    ComfyJS.onSub = async (user, message, subTierInfo, extra) => {
+        await buildSubMessage(user, message, extra);
+    }
+    ComfyJS.onResub = async (user, message, streakMonths, cumulativeMonths, subTierInfo, extra) => {
+        await buildSubMessage(user, message, extra);
+    }
+    
+    // Event: gifted subscription
+    //ComfyJS.onSubGift = async (gifterUser, streakMonths, recipientUser, senderCount, subTierInfo, extra) => {
+    //    await buildGiftMessage(gifterUser, extra);
+    //}
+    ComfyJS.onSubMysteryGift = async (gifterUser, numbOfSubs, senderCount, subTierInfo, extra) => {
+        await buildGiftMessage(gifterUser, extra, numbOfSubs);
+    }
+
+    // Event: delete message
+    ComfyJS.onMessageDeleted = async (id, extra) => {
+        var message = document.getElementById(`${id}`);
+        message.remove();
     }
 </script>
 
