@@ -31,7 +31,7 @@
 ## Version History:
 ### Version 0.3:
 - Reworked the setup to allow for easier settings and updating in the future
-    - Following an update, just replace the HTML file with the new one and it'll work with the same browser source
+    - For future updates, just replace the HTML file with the new one and it'll work with the same browser source
 - Added option to display user pronouns
 - Added option to change the message fade-out delay
 - Added option to change the scale
