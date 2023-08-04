@@ -26,6 +26,7 @@
  ![Screenshot](/Resources/Screenshot.PNG?raw=true "Screenshot")
  
 ## Planned To-Do List:
+- Solve some weird CSS quirks
 - Use custom channel-badges for subs (difficult; Twitch API wants credentials for that)
 
 ## Version History:
